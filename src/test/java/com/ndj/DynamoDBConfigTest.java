@@ -1,27 +1,56 @@
 package com.ndj;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
+import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
+import com.amazonaws.services.dynamodbv2.model.ResourceInUseException;
 import com.ndj.config.DynamoDBConfig;
 import com.ndj.model.User;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.socialsignin.spring.data.dynamodb.core.DynamoDBTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.UUID;
 
 /**
  * Created by don on 26/09/2017.
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringBootTest(classes = Application.class)
+@WebAppConfiguration
+@ActiveProfiles("local")
 public class DynamoDBConfigTest {
 
     private DynamoDBTemplate dynamoDBTemplate;
+    @Autowired
     private DynamoDBConfig dynamoDBConfig;
+    private DynamoDBMapper dynamoDBMapper;
+    private AmazonDynamoDB amazonDynamoDB;
 
     @Before
-    public void setUp() {
-        dynamoDBConfig = new DynamoDBConfig();
-        AmazonDynamoDB amazonDynamoDB = dynamoDBConfig.getDynamoDBInstance();
+    public void setUp() { ;
+        amazonDynamoDB = dynamoDBConfig.getDynamoDBInstance();
         this.dynamoDBTemplate = new DynamoDBTemplate(amazonDynamoDB);
+        dynamoDBMapper = new DynamoDBMapper(amazonDynamoDB);
+
+    }
+
+    public void createtable(){
+        try {
+            dynamoDBMapper = new DynamoDBMapper(amazonDynamoDB);
+
+            CreateTableRequest tableRequest = dynamoDBMapper.generateCreateTableRequest(User.class);
+
+            tableRequest.setProvisionedThroughput(new ProvisionedThroughput(1L, 1L));
+
+            amazonDynamoDB.createTable(tableRequest);
+
+        } catch (ResourceInUseException e) {
+            // Do nothing, table already created
+        }
     }
 
     @Test

@@ -26,7 +26,7 @@ public class DynamoDBConfig {
     public AmazonDynamoDB getDynamoDBInstance() {
         AmazonDynamoDB amazonDynamoDB = AmazonDynamoDBClientBuilder.standard()
            .withCredentials( getCredentialProvider())
-           .withEndpointConfiguration(initializeEndpoint("","")).build();
+           .withEndpointConfiguration(initializeEndpoint("http://localhost:8000/","")).build();
         return amazonDynamoDB;
     }
 
