@@ -1,10 +1,11 @@
 package com.ndj;
 
+import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
-import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
-import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
-import com.amazonaws.services.dynamodbv2.model.ResourceInUseException;
+import com.amazonaws.services.dynamodbv2.document.Table;
+import com.amazonaws.services.dynamodbv2.model.*;
 import com.ndj.config.DynamoDBConfig;
 import com.ndj.model.User;
 import org.junit.Before;
@@ -12,7 +13,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.socialsignin.spring.data.dynamodb.core.DynamoDBTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -24,19 +31,19 @@ import java.util.UUID;
 @ActiveProfiles("local")
 public class DynamoDBConfigTest {
 
-    private DynamoDBTemplate dynamoDBTemplate;
-    @Autowired
-    private DynamoDBConfig dynamoDBConfig;
-    private DynamoDBMapper dynamoDBMapper;
     private AmazonDynamoDB amazonDynamoDB;
+    DynamoDBMapper dynamoDBMapper;
 
     @Before
-    public void setUp() { ;
-        amazonDynamoDB = dynamoDBConfig.getDynamoDBInstance();
+    public void setUp() {
+        amazonDynamoDB = new DynamoDBConfig().getDynamoDBInstance();
         this.dynamoDBTemplate = new DynamoDBTemplate(amazonDynamoDB);
-        dynamoDBMapper = new DynamoDBMapper(amazonDynamoDB);
-
+        createtable();
     }
+
+    private DynamoDBTemplate dynamoDBTemplate;
+
+
 
     public void createtable(){
         try {
@@ -48,10 +55,13 @@ public class DynamoDBConfigTest {
 
             amazonDynamoDB.createTable(tableRequest);
 
+
         } catch (ResourceInUseException e) {
             // Do nothing, table already created
         }
     }
+
+
 
     @Test
     public void testUser_CRUD() {

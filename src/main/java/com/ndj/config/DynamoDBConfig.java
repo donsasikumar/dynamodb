@@ -26,7 +26,8 @@ public class DynamoDBConfig {
     public AmazonDynamoDB getDynamoDBInstance() {
         AmazonDynamoDB amazonDynamoDB = AmazonDynamoDBClientBuilder.standard()
            .withCredentials( getCredentialProvider())
-           .withEndpointConfiguration(initializeEndpoint("http://localhost:8000/","")).build();
+           .withEndpointConfiguration(initializeEndpoint("http://localhost:8000","")).build();
+
         return amazonDynamoDB;
     }
 
@@ -50,7 +51,7 @@ public class DynamoDBConfig {
     public AWSCredentialsProvider getCredentialProvider(){
         return new AWSCredentialsProvider() {
             public AWSCredentials getCredentials() {
-                return new BasicAWSCredentials(AWSAccessKeyId, AWSSecretKey);
+                return new BasicAWSCredentials("AWS-Key", "");
             }
 
             public void refresh() {
